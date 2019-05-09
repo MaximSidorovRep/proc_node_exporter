@@ -1,0 +1,8 @@
+---
+# vars file for nod_proc_exporter
+  
+path_util: /usr/sbin
+home_proc_exp: '{{ path_util }}/proc_exporter'
+
+user_systd: '{{ ansible_user }}'
+group_systd: '{{ ansible_user }}'

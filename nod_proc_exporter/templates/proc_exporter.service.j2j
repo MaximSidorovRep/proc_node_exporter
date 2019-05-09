@@ -1,0 +1,16 @@
+[Unit]
+Description=Prometheus process-exporter
+After=network.target
+
+[Service]
+RemainAfterExit=yes
+User={{ user_systd }}
+Group={{ group_systd }}
+ExecStart={{ home_proc_exp }}/process-exporter -config.path {{ home_proc_exp }}/filename.yml
+ExecStop=/bin/kill -WINCH $MAINPID
+KillMode=process
+Restart=on-failure
+
+
+[Install]
+WantedBy=multi-user.target 

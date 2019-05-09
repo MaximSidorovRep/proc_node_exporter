@@ -1,0 +1,46 @@
+---
+# tasks file for nod_proc_exporter
+
+- name: Create directory 
+  file:
+    path: '{{ item }}'
+    owner: '{{ ansible_user }}'
+    group: '{{ ansible_user }}'
+    mode: 0774
+    state: directory
+  with_items:
+    - '{{ home_proc_exp }}'
+
+- name: Copy util to '{{ path_util }}' 
+  copy:
+    src: '{{ item.src }}'
+    dest: '{{ item.dest }}'
+    owner: '{{ ansible_user }}'
+    group: '{{ ansible_user }}'
+    mode: u=rxw,g=rxw,o=r
+  with_items:
+    - { src: 'node_exporter', dest: '{{ path_util }}' }
+    - { src: 'filename.yml', dest: '{{ home_proc_exp }}' }
+    - { src: 'process-exporter', dest: '{{ home_proc_exp }}' }
+
+- name: Config Script SYSTEMD
+  template:
+    src: '{{ item.src }}'
+    dest: "{{ item.dest }}/{{ item.name }}"
+    owner: '{{ ansible_user }}'
+    group: '{{ ansible_user }}'
+    mode: u=rxw,g=rxw,o=rx
+  with_items:
+    - { src: 'node_exporter.service.j2j', dest: '/etc/systemd/system', name: 'node_exporter.service' }
+    - { src: 'proc_exporter.service.j2j', dest: '/etc/systemd/system', name: 'proc_exporter.service' }
+   
+
+- name: START services util
+  systemd:
+    daemon_reload: yes
+    name: '{{ item }}'
+    enabled: yes
+    state: restarted
+  with_items:
+    - node_exporter.service
+    - proc_exporter.service
