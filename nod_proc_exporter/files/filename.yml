@@ -1,8 +1,20 @@
 
 process_names:
-  # comm is the second field of /proc/<pid>/stat minus parens.
-  # It is the base executable name, truncated at 15 chars.  
-  # It cannot be modified by the program, unlike exe.
-  - comm:
+  - comm: 
+    - chromium-browse
     - bash
-    - firefox
+    - prometheus
+    - gvim
+  - exe: 
+    - /sbin/upstart
+    - /usr/sbin/proc_exporter/proc-exporter
+
+  - name: "{{.ExeFull}}:{{.Matches.Cfgfile}}"
+    exe: 
+    - /usr/sbin/proc_exporter/process-exporter
+    cmdline: 
+    - -config.path\s+(?P<Cfgfile>\S+)
+
+  - name: "{{.ExeFull}}"
+    exe: 
+    - /usr/sbin/node_exporter
